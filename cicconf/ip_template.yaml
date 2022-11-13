@@ -1,0 +1,149 @@
+
+dirs:
+  - design
+  - design/${IP}
+  - documents
+  - sim
+  - work
+
+create:
+  design/${IP}/${CELL}.sch: |
+    v {xschem version=3.0.0 file_version=1.2 }
+    G {}
+    K {}
+    V {}
+    S {}
+    E {}
+    T {Shift-I          Insert new component
+    Shift-Z         Zoom in
+    Ctrl-Z           Zoom out
+    R                 Rotate
+    F                 Full view
+
+    Manual: https://xschem.sourceforge.io/stefan/xschem_man/xschem_man.pdf
+    } -460 -630 0 0 0.6 0.6 {}
+    C {cborder/border_s.sym} 520 0 0 0 {
+    user="wulff"
+    company="wulff"}
+    C {devices/ipin.sym} -560 -840 0 0 {name=p1 lab=VDD_1V8}
+    C {devices/ipin.sym} -560 30 0 0 {name=p2 lab=VSS}
+    C {devices/ipin.sym} -560 -440 0 0 {name=p3 lab=PWRUP_1V8}
+  work/Makefile: |
+
+    #- Core makefile provides the following commands:
+    # -----------------------------------------------------------
+    # ip: generate ../design/<LIB> from ../cic/ip.json
+    # gds: generate gds/<CELL>.gds
+    # cdl: generate cdl/<CELL>.cdl
+    # lvs: Check cdl/<CELL>.cdl versus ../design/<LIB>/<CELL>.mag
+    # lpe: Extract parasitics lpe/<CELL>.spi
+    # drc: Run design rule checks on ../design/<LIB>/<CELL>.mag
+    # -----------------------------------------------------------
+    include ../tech/make/core.make
+
+    PREFIX=
+    LIB=${IP}
+    CELL=${CELL}
+
+    #- Provide cells you want to check for the lvsall drcall commands
+    CELLS = ${CELL}
+
+  sim/Makefile: |
+    include ../tech/make/sim.make
+
+    LIB=${IP}
+    CELL=${CELL}
+
+
+  work/.magicrc: |
+    source ../tech/magic/.magicrc
+    addpath ../design/${IP}
+
+  work/xschemrc: |
+    source ../tech/xschem/xschemrc
+    append XSCHEM_LIBRARY_PATH :../design
+  README.md: |
+
+    # ${IP}
+
+    # Who
+    ${USER}
+
+    # Why
+     <explain why you made this module>
+
+    # How
+     <explain short how you made this module>
+
+
+    # What
+
+    | What            | Lib/Folder       | Cell/Name |
+    | :-              | :-:              | :-:       |
+    | Schematic       | ${IP} | ${CELL} |
+    | Layout          | ${IP} | ${CELL} |
+    | LPE             | ${IP} | ${CELL} |
+
+
+    # Changelog/Plan
+    | Version | Status | Comment|
+    | :-| :-| :-|
+    |0.1.0 | :x: | Make something |
+
+
+    # Signal interface
+    | Signal       | Direction | Domain  | Description                               |
+    | :---         | :---:     | :---:   | :---                                      |
+    | VDD_1V8         | Input     | VDD_1V8 | Main supply                               |
+    | VSS         | Input     | Ground  |                                           |
+    | PWRUP_1V8     | Input    | VDD_1V8 | Power up the circuit                       |
+
+
+    # Key parameters
+    | Parameter           | Min     | Typ           | Max     | Unit  |
+    | :---                | :-:     | :-:           | :-:     | :---: |
+    | Technology          |         | GF130NBCDLite |         |       |
+    | AVDD                | 1.7    | 1.8           | 1.9    | V     |
+    | Temperature         | -40     | 27            | 125     | C     |
+
+
+    # Status
+
+    | Stage                       | TYPE | Status | Comment                        |
+    | :---                        | :-:  | :---:  | :--:                           |
+    | Specification               | DOC  | :x:    |                                |
+    | Schematic                   | VIEW | :x:    |                                |
+    | Schematic simulation        | VER  | N/A    |                                |
+    | Layout                      | VIEW | :x:    |                                |
+    | Layout parasitic extraction | VIEW | :x:    |                                |
+    | LPE simulation              | VER  | :x:    |                                |
+    | LVS                         | VER  | :x:    |                                |
+    | DRC                         | VER  | :x:    |                                |
+    | ERC                         | VER  | :x:    |                                |
+    | ANT                         | VER  | :x:    |                                |
+
+do:
+  - ln -s ../tech_sky130B tech
+  - cd work && ln -s ../tech/magic/mos.24bit.dstyle
+  - cd work && ln -s ../tech/magic/mos.24bit.std.cmap
+  - cd sim && ln -s ../tech/cicsim/cicsim.yaml
+  - git init
+  - git add .
+  - git add -f work/.magicrc
+  - git add -f work/xschemrc
+  - git add -f work/Makefile
+  - git add -f work/mos.24bit.dstyle
+  - git add -f work/mos.24bit.std.cmap
+  - git commit -m "Made ${IP}" -a
+
+
+echo: |
+
+  Actions:
+    1. Create an github repository, and set remote of ${IP}
+    2. Update config.yaml to point to your new repository,
+       and create a pull request to wulffern
+    3. cd ${ip}/work/; make xview
+    4. Have fun!
+
+  Good luck with ${IP}.
