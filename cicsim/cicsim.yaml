@@ -45,3 +45,13 @@ corner:
     .lib  "$PDK_ROOT/sky130B/libs.tech/ngspice/sky130.lib.spice" hl
   Alh: |
     .lib  "$PDK_ROOT/sky130B/libs.tech/ngspice/sky130.lib.spice" lh
+  Amctt: |
+    .lib  "$PDK_ROOT/sky130B/libs.tech/ngspice/sky130.lib.spice" tt_mm
+  Amcsf: |
+    .lib  "$PDK_ROOT/sky130B/libs.tech/ngspice/sky130.lib.spice" sf_mm
+  Amcfs: |
+    .lib  "$PDK_ROOT/sky130B/libs.tech/ngspice/sky130.lib.spice" fs_mm
+  Amcff: |
+    .lib  "$PDK_ROOT/sky130B/libs.tech/ngspice/sky130.lib.spice" ff_mm
+  Amcss: |
+    .lib  "$PDK_ROOT/sky130B/libs.tech/ngspice/sky130.lib.spice" ss_mm

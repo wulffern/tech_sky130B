@@ -105,10 +105,11 @@ create:
     | ANT                         | VER  | :x:    |                                |
 
 do:
-  - ln -s ../tech_sky130B tech
+  - ln -s ../tech_sky130A tech
   - cd work && ln -s ../tech/magic/mos.24bit.dstyle
   - cd work && ln -s ../tech/magic/mos.24bit.std.cmap
   - cd sim && ln -s ../tech/cicsim/cicsim.yaml
+  - cd cic && ln -s ../tech/cic/sky130A.tech
   - git add .
   - git add -f work/.magicrc
   - git add -f work/xschemrc
