@@ -12,6 +12,7 @@ copy:
   - tran.spi
   - tran.py
   - tran.meas
+  - tran.yaml
   - Makefile
   - summary.yaml
 do:
