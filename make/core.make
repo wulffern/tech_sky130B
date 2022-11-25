@@ -30,6 +30,8 @@ PRCELL = ${PREFIX}${CELL}
 
 PDKPATH=${PDK_ROOT}/sky130B
 
+
+
 .PHONY: drc lvs lpe gds cdl
 
 
@@ -65,21 +67,17 @@ BUILD=../design/
 
 CICEXCLUDE?=""
 
-CICDIR=${HOME}/pro/cic/ciccreator
-ifeq ("$(wildcard $(CICDIR))","")
+#- Cicpy
+CICPY=cicpy
+
+#- Ciccreator
+CICDIR=../../ciccreator
+ifneq "$(wildcard $(CICDIR) )" ""
+CIC=${CICDIR}/bin/cic
+CICGUI=${CICDIR}/bin/cic-gui
+else
 CIC=cic
 CICGUI=cic-gui
-CICPY=cicpy
-else
-ifeq ($(UNAME_S),Linux)
-CIC=cic
-CICGUI=cic-gui
-CICPY=cicpy
-else
-CIC=${HOME}/pro/cic/ciccreator/bin/cic
-CICGUI=${HOME}/pro/cic/ciccreator/bin/cic-gui
-CICPY = python3 ${HOME}/pro/cicpy/cicpy/cic.py
-endif
 endif
 
 CICVIEWS =  --spice --verilog --xschem --magic
