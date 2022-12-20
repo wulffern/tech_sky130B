@@ -11,7 +11,7 @@ def main(name):
   with open(yamlfile) as fi:
     obj = yaml.safe_load(fi)
 
-  # Do something to parametes
+  # Do something to parameters
 
   # Save new yaml file
   with open(yamlfile,"w") as fo:

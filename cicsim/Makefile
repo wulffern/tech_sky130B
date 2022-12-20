@@ -38,7 +38,10 @@ temp: netlist
 summary:
 	cicsim summary --output "README.md"
 
-all: typall etc mc
+slide:
+	pandoc -s  -t slidy README.md -o README.html
+
+all: typical etc mc summary slide
 
 clean:
 	-rm -rf output_*

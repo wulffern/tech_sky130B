@@ -32,7 +32,7 @@ PDKPATH=${PDK_ROOT}/sky130B
 
 
 
-.PHONY: drc lvs lpe gds cdl
+.PHONY: drc lvs lpe gds cdl xsch
 
 
 #----------------------------------------------------------------------------
@@ -85,6 +85,47 @@ CICVIEWS =  --spice --verilog --xschem --magic
 RDIR=2>&1
 
 
+define TECH_HELP
+*****************************************************************
+                 Technology make system
+******************************************************************
+I know I will forget, so I write everything down in a Makefile
+
+The command 'make' reads a Makefile, and runs the first command.
+
+You can specify the commands by adding them after 'make'
+, for example 'make help' prints this text
+
+Most commands in this Makefile use two parameters, LIB, and CELL.
+For example:
+
+	make xsch LIB=RPLY_EX0_SKY130NM CELL=RPLY_EX0
+
+generates a netlist from schematic in xsch/RPLY_EX0.spice
+
+To see what a make command does, add a '-n' option
+For example:
+	make xsch LIB=RPLY_EX0_SKY130NM CELL=RPLY_EX0 -n
+
+Outputs:
+	test -d xsch || mkdir xsch
+	xschem -q -x -b -s -n ../design/RPLY_EX0_SKY130NM/RPLY_EX0.sch
+
+Commands:
+   gds    Generate GDSII from layout
+   xsch   Generate netlist from schematic
+   xlvs   Run Layout Versus Schematic
+   drc    Run Design Rule Checks
+   doc    Use pandoc to convert README.md into README.html
+   xview  Start Xschem
+endef
+
+export TECH_HELP
+
+help:
+	@echo "$${TECH_HELP}"
+
+
 ip:
 	cd ${BUILD};${CIC}  --I ../cic ../cic/ip.json  ../cic/sky130.tech ${LIB} ${CICOPT}
 	cd ${BUILD}; ${CICPY}  transpile ${LIB}.cic ../cic/sky130.tech ${LIB}  ${CICVIEWS} --smash "(P|N)CHIOA" --exclude ${CICEXCLUDE}
@@ -97,20 +138,34 @@ gds:
 	@${ECHO} "load ${NCELL}.mag\ncalma write gds/${PRCELL}.gds \nquit" > gds/${PRCELL}.tcl
 	@magic -noconsole -dnull gds/${PRCELL}.tcl > gds/${PRCELL}.log  ${RDIR}
 
-cdl:
-	@test -d cdl || mkdir cdl
-	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice hierarchy off\next2spice subcircuits off\next2spice -o cdl/${PRCELL}.spi\nquit" > cdl/${PRCELL}.tcl
-	@magic -noconsole -dnull cdl/${PRCELL}.tcl > cdl/${PRCELL}.log ${RDIR}
+#cdl:
+	#echo "Not implemented"
+	#@test -d cdl || mkdir cdl
 
-cdlh:
-	@test -d cdl || mkdir cdl
-	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice subcircuits off\next2spice -o cdl/${PRCELL}.spi\nquit" > cdl/${PRCELL}.tcl
-	@magic -noconsole -dnull cdl/${PRCELL}.tcl  > cdl/${PRCELL}.log ${RDIR}
+xsch:
+	@test -d xsch || mkdir xsch
+	xschem -q -x -b -s -n ../design/${LIB}/${CELL}.sch
+
+xlvs:
+	@test -d lvs || mkdir lvs
+	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
+	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
+	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
+	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
+
+
+
+#cdlh:
+#	@test -d cdl || mkdir cdl
+#	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice subcircuits off\next2spice -o cdl/${PRCELL}.spi\nquit" > cdl/${PRCELL}.tcl
+#	@magic -noconsole -dnull cdl/${PRCELL}.tcl  > cdl/${PRCELL}.log ${RDIR}
 
 #- Run flat LVS
 lvs:
 	@test -d lvs || mkdir lvs
-	@netgen -batch lvs "cdl/${PRCELL}.spi ${PRCELL}"  "${BUILD}/${LIB}.spi ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
+	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice hierarchy off\next2spice subcircuits off\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
+	@magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
+	@netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "${BUILD}/${LIB}.spi ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
 	@grep -e "Circuits match uniquely" -e "Netlists do not match"  lvs/${PRCELL}_lvs.log|uniq|perl -ne "use Term::ANSIColor;print(sprintf(\"%-40s\t[ \",${PRCELL}));if(m/match uniquely/ig){print(color('green').'LVS OK  '.color('reset'));}else{print(color('red').'LVS FAIL'.color('reset'));};print(\" ]\n\");"
 
 #- Run DRC
