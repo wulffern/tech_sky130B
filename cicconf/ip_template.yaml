@@ -59,7 +59,7 @@ create:
     # lpe: Extract parasitics lpe/<CELL>.spi
     # drc: Run design rule checks on ../design/<LIB>/<CELL>.mag
     # -----------------------------------------------------------
-    include ../tech/make/core.make
+
 
     PREFIX=
     LIB=${IP}
@@ -67,6 +67,8 @@ create:
 
     #- Provide cells you want to check for the lvsall drcall commands
     CELLS = ${CELL}
+
+    include ../tech/make/core.make
 
   sim/Makefile: |
     include ../tech/make/sim.make

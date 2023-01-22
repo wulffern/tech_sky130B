@@ -8,11 +8,21 @@ my $ok = 0;
 my $match = 0;
 my $propOk = 1;
 while(<>){
+  print $_;
   if(m/match uniquely/ig){
     $match = 1;
   }
   if(m/Property errors were found/ig){
      $propOk = 0;
+  }
+  if(m/failed pin matching/ig){
+     $propOk = 0;
+  }
+  if(m/Final result: Netlists do not match/){
+    $match = 0;
+  }
+  if(m/Final result: Circuits match uniquely/){
+    $match = 1;
   }
 }
 
