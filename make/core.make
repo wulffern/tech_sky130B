@@ -134,13 +134,10 @@ view:
 	@cd ${BUILD}; ${CICGUI} ${LIB}.cic ../cic/sky130.tech
 
 gds:
-	@test -d gds || mkdir gds
-	@${ECHO} "load ${NCELL}.mag\ncalma write gds/${PRCELL}.gds \nquit" > gds/${PRCELL}.tcl
-	@magic -noconsole -dnull gds/${PRCELL}.tcl > gds/${PRCELL}.log  ${RDIR}
+	test -d gds || mkdir gds
+	${ECHO} "load ${NCELL}.mag\ncalma write gds/${PRCELL}.gds \nquit" > gds/${PRCELL}.tcl
+	magic -noconsole -dnull gds/${PRCELL}.tcl > gds/${PRCELL}.log  ${RDIR}
 
-#cdl:
-	#echo "Not implemented"
-	#@test -d cdl || mkdir cdl
 
 xsch:
 	@test -d xsch || mkdir xsch
@@ -149,6 +146,13 @@ xsch:
 xlvs:
 	@test -d lvs || mkdir lvs
 	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
+	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
+	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
+	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
+
+xflvs:
+	@test -d lvs || mkdir lvs
+	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice hierarchy off\next2spice subcircuits off\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
 	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
 	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
