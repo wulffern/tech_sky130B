@@ -59,6 +59,7 @@ endif
 LMAG=../design/${LIB}
 NCELL=${LMAG}/${PRCELL}
 MCELL=${NCELL}.mag
+WORK=../../work
 
 SUB=BULKN
 
@@ -144,15 +145,15 @@ xsch:
 	xschem -q -x -b -s -n ../design/${LIB}/${CELL}.sch
 
 xlvs:
-	@test -d lvs || mkdir lvs
-	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\ncd ${LMAG}\n load ${PRCELL}.mag\nextract all\n\next2spice lvs\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
+	test -d lvs || mkdir lvs
+	${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\ncd ${LMAG}\nload ${PRCELL}.mag\nextract all\next2spice lvs\next2spice -o ${WORK}/lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
 	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
 	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
 
 xflvs:
 	@test -d lvs || mkdir lvs
-	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\ncd ${LMAG}\n load ${PRCELL}.mag\nextract all\n\next2spice lvs\next2spice hierarchy off\next2spice subcircuits off\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
+	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\ncd ${LMAG}\n load ${PRCELL}.mag\nextract all\next2spice lvs\next2spice hierarchy off\next2spice subcircuits off\next2spice -o ${WORK}/lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
 	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
 	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
@@ -166,11 +167,11 @@ xflvs:
 
 #- Run flat LVS
 lvs:
-	@test -d lvs || mkdir lvs
-	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice hierarchy off\next2spice subcircuits off\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
-	@magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
-	@netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "${BUILD}/${LIB}.spi ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
-	@grep -e "Circuits match uniquely" -e "Netlists do not match"  lvs/${PRCELL}_lvs.log|uniq|perl -ne "use Term::ANSIColor;print(sprintf(\"%-40s\t[ \",${PRCELL}));if(m/match uniquely/ig){print(color('green').'LVS OK  '.color('reset'));}else{print(color('red').'LVS FAIL'.color('reset'));};print(\" ]\n\");"
+	test -d lvs || mkdir lvs
+	${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice hierarchy off\next2spice subcircuits off\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
+	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
+	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "${BUILD}/${LIB}.spi ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
+	grep -e "Circuits match uniquely" -e "Netlists do not match"  lvs/${PRCELL}_lvs.log|uniq|perl -ne "use Term::ANSIColor;print(sprintf(\"%-40s\t[ \",${PRCELL}));if(m/match uniquely/ig){print(color('green').'LVS OK  '.color('reset'));}else{print(color('red').'LVS FAIL'.color('reset'));};print(\" ]\n\");"
 
 #- Run DRC
 drc:
