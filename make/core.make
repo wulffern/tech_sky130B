@@ -145,14 +145,14 @@ xsch:
 
 xlvs:
 	@test -d lvs || mkdir lvs
-	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\ncd ${LMAG}\n load ${PRCELL}.mag\nextract all\n\next2spice lvs\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
+	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
 	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
 	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
 
 xflvs:
 	@test -d lvs || mkdir lvs
-	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\ncd ${LMAG}\n load ${PRCELL}.mag\nextract all\n\next2spice lvs\next2spice hierarchy off\next2spice subcircuits off\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
+	@${ECHO} "set VDD AVDD\nset GND AVSS\nset SUB ${SUB}\nload ${NCELL}.mag\nextract all\n\next2spice lvs\next2spice hierarchy off\next2spice subcircuits off\next2spice -o lvs/${PRCELL}.spi\nquit" > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
 	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
 	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
