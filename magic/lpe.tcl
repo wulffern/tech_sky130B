@@ -1,14 +1,16 @@
-set VDD AVDD
-set GND AVSS
-set SUB 0
-load {PATH}/{CELL}.mag
-select top cell
 
+load {PATH}/{CELL}.mag
+
+select top cell
 #- Tim does not trust hierarchy extract, but port order gets screwed up with flat
 #flatten {CELL}_flat
 #load {CELL}_flat
 
 extract all
+set VDD AVDD
+set GND AVSS
+set SUB AVSS
+
 ext2sim labels on
 ext2sim
 
