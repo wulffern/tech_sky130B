@@ -103,7 +103,8 @@ append XSCHEM_LIBRARY_PATH :../../sun_sar9b_sky130nm/design
 append XSCHEM_LIBRARY_PATH :../../cpdk/design
 
 
-set top_subckt 1
+#set top_subckt 1
+#set lvs_netlist 1
 
 ###########################################################################
 #### NETLIST AND HIERARCHICAL PRINT EXCLUDE PATTERNS
