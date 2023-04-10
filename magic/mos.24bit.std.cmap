@@ -41,7 +41,7 @@
 200 230 230 56  caption_blue
 180 210 180 57  window_gray
 0   0   0   58
-246 246 7   59  label_yellow
+255 0 0   59  label_yellow
 180 180 180 60  medium_gray
 230 180 50  61  pale_orange
 235 235 235 62  light_gray
