@@ -181,11 +181,12 @@ drc:
 #--------------------------------------------------------------------------------------
 #- Run parasitic extraction
 #--------------------------------------------------------------------------------------
-lpe:
+lpe: xsch
 	test -d lpe || mkdir lpe
 	cat ../tech/magic/lpe.tcl |perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;'  > lpe/${PRCELL}_lpe.tcl
 	magic -noconsole -dnull lpe/${PRCELL}_lpe.tcl ${RDIR} | tee lpe/${PRCELL}_magic_lpe.log
 	perl -pi -e "s/_flat//ig;" lpe/${PRCELL}_lpe.spi
+	../tech/script/fixlpe lpe/${PRCELL}_lpe.spi xsch/${PRCELL}.spice ${PRCELL}
 
 lvsall:
 	@${foreach b, ${CELLS}, ${MAKE} -s cdl lvs CELL=$b;}
