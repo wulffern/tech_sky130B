@@ -36,11 +36,11 @@ my $fo;
 open($fo,"<","$lpe") or die "Could not open $lpe";
 while(<$fo>){
 
-    if($enable && ! m/\+/ig){
+    if($enable && not m/\+/ig){
         $enable = 0;
         $outbuff .= "* Replacing the lpe port list (../tech/scripts/fixlpe)\n";
         $outbuff .= $buffer."";
-        $outbuff .= "*" . $cktbuff;
+        $outbuff .= $cktbuff;
     }
 
     if(m/.subckt $cell\s+/){
@@ -48,7 +48,7 @@ while(<$fo>){
     }
 
     if($enable){
-        $cktbuff .= $_;
+        $cktbuff .= "*" . $_;
     }else{
         $outbuff .= $_;
     }
