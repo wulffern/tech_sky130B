@@ -30,8 +30,6 @@ PRCELL = ${PREFIX}${CELL}
 
 PDKPATH=${PDK_ROOT}/sky130B
 
-
-
 .PHONY: drc lvs lpe gds cdl xsch
 
 
@@ -126,6 +124,7 @@ help:
 	@echo "$${TECH_HELP}"
 
 
+
 ip:
 	cd ${BUILD};${CIC}  --I ../cic ../cic/ip.json  ../cic/sky130.tech ${LIB} ${CICOPT}
 	cd ${BUILD}; ${CICPY}  transpile ${LIB}.cic ../cic/sky130.tech ${LIB}  ${CICVIEWS} --smash "(P|N)CHIOA" --exclude ${CICEXCLUDE}
@@ -188,8 +187,18 @@ lpe: xsch
 	perl -pi -e "s/_flat//ig;" lpe/${PRCELL}_lpe.spi
 	../tech/script/fixlpe lpe/${PRCELL}_lpe.spi xsch/${PRCELL}.spice ${PRCELL}
 
+lpeh: xsch
+	test -d lpe || mkdir lpe
+	cat ../tech/magic/lpeh.tcl |perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;'  > lpe/${PRCELL}_lpe.tcl
+	magic -noconsole -dnull lpe/${PRCELL}_lpe.tcl ${RDIR} | tee lpe/${PRCELL}_magic_lpe.log
+	perl -pi -e "s/_flat//ig;" lpe/${PRCELL}_lpe.spi
+	../tech/script/fixlpe lpe/${PRCELL}_lpe.spi xsch/${PRCELL}.spice ${PRCELL}
+
 lvsall:
 	@${foreach b, ${CELLS}, ${MAKE} -s cdl lvs CELL=$b;}
+
+xlvsall:
+	@${foreach b, ${CELLS}, ${MAKE} -s xsch xlvs CELL=$b;}
 
 lpeall:
 	@${foreach b, ${CELLS}, ${MAKE} -s lpe CELL=$b;}
@@ -201,7 +210,7 @@ doc:
 	pandoc -s ../README.md -o ../README.html
 
 clean:
-	-rm -rf lvs drc lpe cdl gds
+	-rm -rf lvs drc lpe cdl gds *.ext *.sim *.nodes
 
 spi:
 	test -d xsch || mkdir xsch
