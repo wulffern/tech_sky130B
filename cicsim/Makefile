@@ -1,12 +1,14 @@
+
+include ../../tech/make/sim.make
+
 TB=tran
 VIEW=Sch
 #VIEW=Lay
-
+CELL=${CELL}
+LIB =${IP}
 OPT=
 
-netlist:
-	cd ../../work && xschem -q -x -b -s -n ../design/${IP}/${CELL}.sch
-	perl -pi -e "s/\*\*\.subckt/\.subckt/ig;s/\*\*\.ends/\.ends/ig;" ../../work/xsch/${CELL}.spice
+
 
 test:
 	${MAKE} typical OPT="Debug"
