@@ -183,6 +183,7 @@ drc:
 #--------------------------------------------------------------------------------------
 lpe: xsch
 	test -d lpe || mkdir lpe
+	-rm lpe/${PRCELL}_lpe.spi
 	cat ../tech/magic/lpe.tcl |perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;'  > lpe/${PRCELL}_lpe.tcl
 	magic -noconsole -dnull lpe/${PRCELL}_lpe.tcl ${RDIR} | tee lpe/${PRCELL}_magic_lpe.log
 	perl -pi -e "s/_flat//ig;" lpe/${PRCELL}_lpe.spi
