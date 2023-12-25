@@ -6,4 +6,4 @@ netlist:
 #- TODO: Should I add the view here? Either xsch or lpe??
 	test -d ../../work/xsch || mkdir ../../work/xsch
 	cd ../../work && xschem -q -x -b -s -n ../design/${LIB}/${CELL}.sch
-	perl -pi -e "s/\*\*\.subckt/\.subckt/ig;s/\*\*\.ends/\.ends/ig;" ../../work/xsch/${CELL}.spice
+	perl -pi -e "s/\*\*\.subckt/\.subckt/ig;s/\*\*\.ends/\.ends/ig;s/,/ /ig;" ../../work/xsch/${CELL}.spice
