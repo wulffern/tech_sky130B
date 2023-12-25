@@ -104,6 +104,7 @@ append XSCHEM_LIBRARY_PATH :../../cpdk/design
 
 
 #set top_subckt 1
+
 #set lvs_netlist 1
 
 ###########################################################################
