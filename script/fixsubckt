@@ -3,9 +3,11 @@
 # Xschem adds ** infront of subckts for some reason (probably to emulate test bench top)
 # I'm not a fan. I want subckt on top, so I can make a DUT in my TB, as such, fix
 
-
 my $replacePlus = 0;
 while(<>){
+
+  #- Remove the bus notation
+  s/,/ /ig;
 
   if(m/\*\*.subckt/ig){
     s/\*\*//ig;
@@ -20,8 +22,13 @@ while(<>){
     next;
   }
 
+
+
   $replacePlus = 0;
 
   s/\*\*\.ends/\.ends/ig;
+
+
+
   print $_;
 }
