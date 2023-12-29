@@ -17,7 +17,6 @@ copy:
   - summary.yaml
 do:
   - make netlist
-  - cicsim portreplace tran.spi ../../work/xsch/${CELL}.spice ${CELL}
   - git add Makefile cicsim.yaml tran.spi tran.meas tran.py summary.yaml tran.yaml
 
 
