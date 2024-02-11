@@ -58,12 +58,16 @@ create:
     # lvs: Check cdl/<CELL>.cdl versus ../design/<LIB>/<CELL>.mag
     # lpe: Extract parasitics lpe/<CELL>.spi
     # drc: Run design rule checks on ../design/<LIB>/<CELL>.mag
+    # svg: Make schematic SVGs in ../documents/schematic.md
     # -----------------------------------------------------------
 
 
     PREFIX=
     LIB=${IP}
     CELL=${CELL}
+
+    #- Which libraries to make SVG files for
+    SVGLIBS=${IP}
 
     #- Provide cells you want to check for the lvsall drcall commands
     CELLS = ${CELL}

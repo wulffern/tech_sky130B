@@ -11,7 +11,7 @@
 *-----------------------------------------------------------------
 * OPTIONS
 *-----------------------------------------------------------------
-.option TNOM=27 GMIN=1e-15
+.option TNOM=27 GMIN=1e-15 reltol=1e-3
 
 *-----------------------------------------------------------------
 * PARAMETERS
@@ -39,12 +39,8 @@ VDD  VDD_1V8  VSS  pwl 0 0 10n {AVDD}
 *----------------------------------------------------------------
 * PROBE
 *----------------------------------------------------------------
-
-#ifdef Debug
 .save all
-#else
-.save ${VPORTS}
-#endif
+
 
 *----------------------------------------------------------------
 * NGSPICE control
@@ -55,16 +51,13 @@ set color0=white
 set color1=black
 unset askquit
 
-optran 0 0 0 100p 2n 0
+optran 0 0 0 1n 1u 0
 
-#ifdef Debug
-tran 10p 1n 1p
-*quit
-#else
-tran 10p 10n 1p
+
+tran 1n 10n 1p
 write
 quit
-#endif
+
 
 .endc
 

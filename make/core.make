@@ -208,7 +208,7 @@ lpeall:
 drcall:
 	@${foreach  b, ${CELLS}, ${MAKE} -s drc CELL=$b;}
 
-doc:
+doc: svg dclone
 	pandoc -s ../README.md -o ../README.html
 
 clean:
@@ -221,3 +221,39 @@ spi:
 
 xview:
 	xschem -b  ../design/${LIB}/${CELL}.sch &
+
+SCHS := $(wildcard ../design/${LIB}/*.sch)
+BINS := $(SCHS:%.sch=%)
+SVGP =${<:%.sch=%}.svg
+MDP =${<:%.sch=%}.md
+SVG = ${subst ../design/,,${SVGP}}
+
+svg:
+	test -d ../documents/ || mkdir ../documents
+	@echo "---\nlayout: page\ntitle: Schematic\npermalink: sch\n---\n" > ../documents/schematic.md
+
+	${foreach l, ${SVGLIBS}, ${MAKE} svgf LIB=${l};}
+	pandoc -s ../documents/schematic.md -o ../documents/schematic.html
+
+svgf: ${BINS}
+
+%: %.sch
+	xschem --preinit "set dark_colorscheme 0" -x -q -p --svg $<
+	echo "## ${SVG}\n\n" >> ../documents/schematic.md
+	echo "\n\n![${SVG}](${SVG})\n\n" >> ../documents/schematic.md
+	-test -f ${MDP} && cat ${MDP} >> ../documents/schematic.md
+	test -d  ../documents/${LIB} || mkdir ../documents/${LIB}
+	cp plot.svg ../documents/${SVG}
+
+
+LINKLIBS = ${shell find ../design -d 1 -type l}
+fmdclone = ../install.md
+dclone:
+	echo "# Clone ${CELL}\n\n" > ${fmdclone}
+	echo "To use this library you need the following libraries\n\n" >> ${fmdclone}
+	echo "\`\`\`bash\n" >> ${fmdclone}
+	git  remote -v |grep fetch|awk '{print "git clone "$$2}' >> ${fmdclone}
+	${foreach l, ${LINKLIBS}, git -C ${l} remote -v |grep fetch|awk '{print "git clone "$$2}' >> ${fmdclone} ;}
+	git -C ../tech remote -v |grep fetch|awk '{print "git clone "$$2}' >> ${fmdclone}
+	git -C ../../cpdk remote -v |grep fetch|awk '{print "git clone "$$2}' >> ${fmdclone}
+	echo "\`\`\`\n\n" >> ${fmdclone}

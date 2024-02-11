@@ -3,7 +3,7 @@
 #set SUB 0
 
 load {PATH}/{CELL}.mag
-writeall force
+#writeall force
 
 select top cell
 #- Tim does not trust hierarchy extract, but port order gets screwed up with flat
@@ -14,7 +14,7 @@ select top cell
 #flatten {CELL}_flat
 #load {CELL}_flat
 
-extract all
+extract
 
 ext2sim labels on
 ext2sim

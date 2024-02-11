@@ -9,7 +9,7 @@ select top cell
 #flatten {CELL}_flat
 #load {CELL}_flat
 
-extract all
+extract
 
 #ext2sim labels on
 #ext2sim
