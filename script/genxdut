@@ -15,8 +15,8 @@ while(<$fh>){
     $foundSubckt = 0;
   }
 
-  if(m/^\s*.subckt\s+$name/i){
-    s/\s*.subckt\s+$name//ig;
+  if(m/^\s*.subckt\s+$name\s+/i){
+    s/\s*.subckt\s+$name\s+//ig;
     $ports .= $_;
     $foundSubckt = 1;
   }
