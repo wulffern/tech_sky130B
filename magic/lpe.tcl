@@ -11,10 +11,10 @@ select top cell
 # Also seen for the SUN_PLL that the flat fails simulation, but the hierarcichal is ok.
 # The question is, does the circuit actually fail, or is it the flat lpe that is funky?
 # For now, don't do flat this way
-#flatten {CELL}_flat
-#load {CELL}_flat
+flatten {CELL}_flat
+load {CELL}_flat
 
-extract
+extract all
 
 ext2sim labels on
 ext2sim
