@@ -178,6 +178,10 @@ drc:
 	@magic -noconsole -dnull drc/${PRCELL}_drc.tcl > drc/${PRCELL}_drc.log ${RDIR}
 	@tail -n 1 drc/${PRCELL}_drc.log| perl -ne "\$$exit = 0;use Term::ANSIColor;print(sprintf(\"%-40s\t[ \",${PRCELL}));if(m/:\s+0\n/ig){print(color('green').'DRC OK  '.color('reset'));}else{print(color('red').'DRC FAIL'.color('reset'));\$$exit = 1;};print(\" ]\n\");exit \$$exit;" || tail -n 10 drc/${PRCELL}_drc.log
 
+kdrc:
+	klayout -b -r ${PDK_ROOT}/sky130B/libs.tech/klayout/drc/sky130B_mr.drc  -rd input=gds/${PRCELL}.gds -rd topcell=${PRCELL} -rd report=../drc/${PRCELL}_drc.xml -rd thr=8 -rd feol=true -rd beol=true -rd offgrid=true >& drc/${PRCELL}_kdrc.log
+
+
 #--------------------------------------------------------------------------------------
 #- Run parasitic extraction
 #--------------------------------------------------------------------------------------
