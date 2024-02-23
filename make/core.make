@@ -111,7 +111,7 @@ Outputs:
 
 Commands:
    gds    Generate GDSII from layout
-   xsch   Generate netlist from schematic
+   xsch   Generate spice netlist from schematic
    xlvs   Run Layout Versus Schematic
    drc    Run Design Rule Checks
    doc    Use pandoc to convert README.md into README.html
@@ -145,21 +145,26 @@ xsch:
 #- Fix the xschem netlist, have not figured out the right way to always get a top subckt
 	perl -pi -e "s/\*\*\.subckt/\.subckt/ig;s/\*\*\.ends/\.ends/ig;s/\*\+/\+/ig;" xsch/${CELL}.spice
 
+cdl:
+	@test -d cdl || mkdir cdl
+	xschem -q -x -b -s --tcl "set lvs_netlist 1; set netlist_dir ${PWD}/cdl/; set bus_replacement_char {[]};" -n ../design/${LIB}/${CELL}.sch
+
+
 #--------------------------------------------------------------------------------------
 #- LVS commands
 #--------------------------------------------------------------------------------------
-xlvs:
+xlvs: cdl
 	test -d lvs || mkdir lvs
 	cat ../tech/magic/lvs.tcl|perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;' > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
-	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
+	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "cdl/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
 	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
 
-xflvs:
+xflvs: cdl
 	@test -d lvs || mkdir lvs
 	cat ../tech/magic/lvsf.tcl|perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;' > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
-	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
+	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "cdl/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
 	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
 
 lvs:
@@ -179,7 +184,7 @@ drc:
 	@tail -n 1 drc/${PRCELL}_drc.log| perl -ne "\$$exit = 0;use Term::ANSIColor;print(sprintf(\"%-40s\t[ \",${PRCELL}));if(m/:\s+0\n/ig){print(color('green').'DRC OK  '.color('reset'));}else{print(color('red').'DRC FAIL'.color('reset'));\$$exit = 1;};print(\" ]\n\");exit \$$exit;" || tail -n 10 drc/${PRCELL}_drc.log
 
 kdrc:
-	klayout -b -r ${PDK_ROOT}/sky130B/libs.tech/klayout/drc/sky130B_mr.drc  -rd input=gds/${PRCELL}.gds -rd topcell=${PRCELL} -rd report=../drc/${PRCELL}_drc.xml -rd thr=8 -rd feol=true -rd beol=true -rd offgrid=true >& drc/${PRCELL}_kdrc.log
+	klayout -b -r ${PDK_ROOT}/sky130B/libs.tech/klayout/drc/sky130B_mr.drc  -rd input=gds/${PRCELL}.gds -rd topcell=${PRCELL} -rd report=../drc/${PRCELL}_drc.xml -rd thr=8 -rd feol=true -rd beol=true -rd offgrid=true  >& drc/${PRCELL}_kdrc.log
 
 
 #--------------------------------------------------------------------------------------
