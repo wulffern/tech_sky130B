@@ -33,7 +33,7 @@ set netlist_dir $env(PWD)/xsch
 #### IN SPICE NETLISTS (EXAMPLE: DATA[7] --> DATA<7>)
 ###########################################################################
 #### default: empty (use xschem default, [ ])
-set bus_replacement_char {<>}
+#set bus_replacement_char {<>}
 
 ###########################################################################
 #### SOME DEFAULT BEHAVIOR

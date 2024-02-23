@@ -142,8 +142,10 @@ gds:
 xsch:
 	@test -d xsch || mkdir xsch
 	xschem -q -x -b -s -n ../design/${LIB}/${CELL}.sch
-#- Fix the xschem netlist, have not figured out the right way to always get a top subckt
-	perl -pi -e "s/\*\*\.subckt/\.subckt/ig;s/\*\*\.ends/\.ends/ig;s/\*\+/\+/ig;" xsch/${CELL}.spice
+	cp xsch/${CELL}.spice xsch/${CELL}.spice.bak
+	cat xsch/${CELL}.spice.bak | perl ../tech/script/fixsubckt > xsch/${CELL}.spice
+	-rm xsch/${CELL}.spice.bak
+
 
 cdl:
 	@test -d cdl || mkdir cdl

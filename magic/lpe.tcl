@@ -6,6 +6,8 @@ load {PATH}/{CELL}.mag
 #writeall force
 
 select top cell
+
+extract all
 #- Tim does not trust hierarchy extract, but port order gets screwed up with flat
 # needed to add a script to fix it.
 # Also seen for the SUN_PLL that the flat fails simulation, but the hierarcichal is ok.
