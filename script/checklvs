@@ -3,12 +3,23 @@ use Term::ANSIColor;
 use strict;
 
 my $cell = shift;
+my $short = shift;
+
+$short =~ s/\s+//ig;
+my $doShort = 0;
+if($short eq "--short"){
+  $doShort = 1;
+}
+
 
 my $ok = 0;
 my $match = 0;
 my $propOk = 1;
 while(<>){
-  print $_;
+  if(!$doShort){
+      print $_;
+  }
+
   if(m/match uniquely/ig){
     $match = 1;
   }
@@ -62,8 +73,20 @@ $message
 EOF
 
 
+my $shortstart = sprintf("%-40s\t[ ",$cell);
+my $shortend = " ]\n";
+
+
 if($match && $propOk){
-  print($smiley);
+  if(!$doShort){
+    print($smiley);
+  }else{
+    print($shortstart.color('green').'LVS OK  '.color('reset').$shortend);
+  }
 }else{
-  print($error);
+  if(!$doShort){
+    print($error);
+  }else{
+    print($shortstart.color('red').'LVS FAIL'.color('reset').$shortend)
+  }
 }

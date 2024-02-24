@@ -58,6 +58,9 @@ LMAG=../design/${LIB}
 NCELL=${LMAG}/${PRCELL}
 MCELL=${NCELL}.mag
 
+#- Options
+OPT=
+
 SUB=BULKN
 
 BUILD=../design/
@@ -141,33 +144,33 @@ gds:
 
 xsch:
 	@test -d xsch || mkdir xsch
-	xschem -q -x -b -s -n ../design/${LIB}/${CELL}.sch
+	xschem -q -x -b -s -n ../design/${LIB}/${PRCELL}.sch
 #- Fix the xschem netlist, have not figured out the right way to always get a top subckt
-	perl -pi -e "s/\*\*\.subckt/\.subckt/ig;s/\*\*\.ends/\.ends/ig;s/\*\+/\+/ig;" xsch/${CELL}.spice
+	perl -pi -e "s/\*\*\.subckt/\.subckt/ig;s/\*\*\.ends/\.ends/ig;s/\*\+/\+/ig;" xsch/${PRCELL}.spice
 
 #--------------------------------------------------------------------------------------
 #- LVS commands
 #--------------------------------------------------------------------------------------
-xlvs:
+xlvs: xsch
 	test -d lvs || mkdir lvs
 	cat ../tech/magic/lvs.tcl|perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;' > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
 	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
-	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
+	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL} ${OPT}
 
-xflvs:
+xflvs: xsch
 	@test -d lvs || mkdir lvs
 	cat ../tech/magic/lvsf.tcl|perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;' > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
 	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "xsch/${PRCELL}.spice ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
-	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
+	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL} ${OPT}
 
 lvs:
 	test -d lvs || mkdir lvs
 	cat ../tech/magic/lvs.tcl|perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;' > lvs/${PRCELL}_spi.tcl
 	magic -noconsole -dnull lvs/${PRCELL}_spi.tcl > lvs/${PRCELL}_spi.log ${RDIR}
-	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "${BUILD}/${LIB}.spi ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen_lvs.log
-	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL}
+	netgen -batch lvs "lvs/${PRCELL}.spi ${PRCELL}"  "${BUILD}/${LIB}.spi ${PRCELL}" ${PDKPATH}/libs.tech/netgen/sky130B_setup.tcl lvs/${PRCELL}_lvs.log > lvs/${PRCELL}_netgen.log
+	cat lvs/${PRCELL}_lvs.log | ../tech/script/checklvs ${PRCELL} ${OPT}
 
 #--------------------------------------------------------------------------------------
 #- Run DRC
@@ -200,7 +203,10 @@ lvsall:
 	@${foreach b, ${CELLS}, ${MAKE} -s cdl lvs CELL=$b;}
 
 xlvsall:
-	@${foreach b, ${CELLS}, ${MAKE} -s xsch xlvs CELL=$b;}
+	@${foreach b, ${CELLS}, ${MAKE} -s xlvs CELL=$b;}
+
+xflvsall:
+	@${foreach b, ${CELLS}, ${MAKE} -s xflvs CELL=$b;}
 
 lpeall:
 	@${foreach b, ${CELLS}, ${MAKE} -s lpe CELL=$b;}
