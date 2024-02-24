@@ -200,6 +200,14 @@ lpe: xsch
 	perl -pi -e "s/_flat//ig;" lpe/${PRCELL}_lpe.spi
 	../tech/script/fixlpe lpe/${PRCELL}_lpe.spi xsch/${PRCELL}.spice ${PRCELL}
 
+lper: xsch
+	test -d lpe || mkdir lpe
+	-rm lpe/${PRCELL}_lper.spi
+	cat ../tech/magic/lper.tcl |perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;'  > lpe/${PRCELL}_lper.tcl
+	magic -noconsole -dnull lpe/${PRCELL}_lper.tcl ${RDIR} | tee lpe/${PRCELL}_magic_lper.log
+	perl -pi -e "s/_flat//ig;" lpe/${PRCELL}_lper.spi
+	../tech/script/fixlpe lpe/${PRCELL}_lper.spi xsch/${PRCELL}.spice ${PRCELL}
+
 lpeh: xsch
 	test -d lpe || mkdir lpe
 	cat ../tech/magic/lpeh.tcl |perl -pe 's#{PATH}#${LMAG}#ig;s#{CELL}#${PRCELL}#ig;'  > lpe/${PRCELL}_lpe.tcl
