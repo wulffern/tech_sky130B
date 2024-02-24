@@ -33,7 +33,7 @@ set netlist_dir $env(PWD)/xsch
 #### IN SPICE NETLISTS (EXAMPLE: DATA[7] --> DATA<7>)
 ###########################################################################
 #### default: empty (use xschem default, [ ])
-set bus_replacement_char {<>}
+#set bus_replacement_char {<>}
 
 ###########################################################################
 #### SOME DEFAULT BEHAVIOR
@@ -99,7 +99,7 @@ append XSCHEM_LIBRARY_PATH :${PDK_ROOT}/${PDK}/libs.tech/xschem
 #append XSCHEM_LIBRARY_PATH :../tech/external/xschem_sky130/
 append XSCHEM_LIBRARY_PATH :../../sun_tr_sky130nm/design
 append XSCHEM_LIBRARY_PATH :../../sun_trb_sky130nm/design
-append XSCHEM_LIBRARY_PATH :../../sun_sar9b_sky130nm/design
+#append XSCHEM_LIBRARY_PATH :../../sun_sar9b_sky130nm/design
 append XSCHEM_LIBRARY_PATH :../../cpdk/design
 
 
