@@ -7,5 +7,5 @@ netlist:
 # generate a xdut.spi file that always has the right port ordering.
 #- TODO: Should I add the view here? Either xsch or lpe??
 	test -d ../../work/xsch || mkdir ../../work/xsch
-	cd ../../work/ && make xsch
+	cd ../../work/ && make xsch LIB=${LIB} CELL=${CELL}
 	perl ../../tech/script/genxdut ../../work/xsch/${CELL}.spice ${CELL}

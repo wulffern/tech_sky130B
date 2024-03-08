@@ -8,7 +8,6 @@ open(my $fh, "<", $file) || die "Could not open $file";
 my $ports = "";
 my $foundSubckt = 0;
 while(<$fh>){
-
   if($foundSubckt && m/^\s*\+/){
     $ports .= $_;
   }else{
@@ -19,6 +18,7 @@ while(<$fh>){
     s/\s*.subckt\s+$name\s+//ig;
     $ports .= $_;
     $foundSubckt = 1;
+
   }
 }
 close($fh) || die "Could not close $file";
