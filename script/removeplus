@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+my $last = "";
+while(<>){
+  s/\n//ig;
+
+  if(m/^\s*\+/){
+    s/^\s*\+//ig;
+    $last .= " ".$_;
+
+  }else{
+    print $last."\n";
+    $last = $_;
+  }
+
+}
