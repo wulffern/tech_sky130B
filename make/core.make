@@ -153,7 +153,7 @@ xsch:
 
 cdl:
 	@test -d cdl || mkdir cdl
-	xschem -q -x -b -s --tcl "set lvs_netlist 1; set netlist_dir ${PWD}/cdl/; set bus_replacement_char {[]};" -n ../design/${LIB}/${PRCELL}.sch
+	-xschem -q -x -b -s --tcl "set lvs_netlist 1; set netlist_dir ${PWD}/cdl/; set bus_replacement_char {[]};" -n ../design/${LIB}/${PRCELL}.sch
 
 
 #--------------------------------------------------------------------------------------
