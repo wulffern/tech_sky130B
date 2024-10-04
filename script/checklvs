@@ -46,7 +46,7 @@ if(!$match){
 }
 
 if(!$propOk){
-  $message .= " Error: Property errors\n";
+  $message .= " Warning: Property errors\n";
 }
 
 if(!$match || !$propOk){
